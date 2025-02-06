@@ -1,0 +1,190 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n static admin_datta %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        p {
+            
+            font-size: 20px; /* You can adjust the font size as needed */
+            color: black;
+        }
+    </style>
+    <!-- Meta tags, title, and CSS links here... -->
+</head>
+<body>
+    <h2 class="mb-4">Claim Your Credits</h2>
+    <button id="connectWallet" class="btn btn-primary">Connect Wallet</button><br>
+    <br>
+    <div id="walletAddress"></div>
+    <br>
+    <div id="recoinBalance">
+        <p>Recoin Balance<p>
+    </div>
+    <br><br>
+    {% for c in cp %}
+    <div class="container">
+        
+        <h3 class="mb-4" style="font-size: 30px; font-weight:bold;">Requestid {{ c.requestid }}</h3>
+
+        <!-- Display information from the creditapprove object -->
+        <p>Name: {{ c.username }}</p>
+        <p>Device: {{ c.device_type }}</p>
+
+        <!-- Claim Credits Button -->
+       
+        <button id="claimCredits" class="btn btn-success">Claim Credits</button>
+    
+        <br>
+
+    </div>
+    {% endfor %}
+
+    <!-- JavaScript to handle wallet connection and contract interaction -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js"></script>
+    <script>
+        // Contract address (hardcoded)
+        const tokenAddress = '0x71F32CfE106CaA555F5367224e9d107d71CDD5e9'; // Replace with your token's actual address
+
+        // Contract ABI (hardcoded)
+        const tokenABI =[
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "recipient",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                }
+            ],
+            "name": "transferTokens",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "name": "recoin",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "tokenAddress",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ];
+
+        // Function to handle the "Connect Wallet" button click
+        // Function to handle the "Connect Wallet" button click
+    document.getElementById('connectWallet').addEventListener('click', async () => {
+    try {
+        // Connect to a wallet (MetaMask or any Ethereum wallet)
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        
+        // Display the connected wallet address
+        const walletAddress = accounts[0];
+        document.getElementById('walletAddress').textContent = `Connected Wallet Address: ${walletAddress}`;
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(tokenAddress, tokenABI, provider);
+        const initialRecoinBalance = await contract.recoin(walletAddress);
+        document.getElementById('recoinBalance').textContent = `Recoin Balance: ${initialRecoinBalance.toString()}`;
+        
+        console.log('Connected Wallet:', walletAddress);
+    } catch (error) {
+        console.error(error);
+    }
+    });
+
+
+        // Function to handle the "Claim Credits" button click
+        document.getElementById('claimCredits').addEventListener('click', async () => {
+            try {
+                // Get the recipient address from your creditapprove object
+                const recipientAddress = '0x2a927E688859BcA4D199aA710BB1B42022f4B12E'; // Replace with the actual recipient address
+        
+                // Amount of credits to claim (you can adjust this)
+                const amount = 100; // Replace with the actual credit amount
+        
+                // Create an instance of your smart contract
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const contract = new ethers.Contract(tokenAddress, tokenABI, signer);
+        
+                // Prepare and send the transaction to your smart contract
+                const transaction = await contract.transferTokens(recipientAddress, amount);
+        
+                // Wait for the transaction to be mined
+                await transaction.wait();
+        
+                // Make an HTTP request to update claim_credit in the backend
+                await updateClaimCreditInBackend();
+        
+                // Update the user's "recoin" balance in your database (You'll need your backend logic for this)
+                // Example: Send an HTTP request to your backend API to update the balance
+        
+                const updatedRecoinBalance = await contract.recoin(signer.getAddress());
+                document.getElementById('recoinBalance').textContent = `Recoin Balance: ${updatedRecoinBalance.toString()}`;
+        
+                // Toggle the "Claim Credits" button based on claim_credit value
+                const claimCreditButton = document.getElementById('claimCredits');
+                claimCreditButton.disabled = true; // Disable the button
+                claimCreditButton.innerText = 'Credits Claimed'; // Change the button text
+        
+                console.log('Credits claimed successfully');
+            } catch (error) {
+                console.error(error);
+            }
+        });
+        async function updateClaimCreditInBackend() {
+            try {
+                // Make an HTTP POST request to your Django endpoint to update claim_credit
+                const response = await fetch('/update_claim_credit/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ claim_credit: 0 }), // Set claim_credit to 0
+                });
+        
+                if (response.status === 200) {
+                    console.log('Claim Credit updated in the backend');
+                } else {
+                    console.error('Failed to update Claim Credit in the backend');
+                }
+            } catch (error) {
+                console.error('Error updating Claim Credit in the backend:', error);
+            }
+        }    
+    </script>
+</body>
+</html>
+{% endblock content %}

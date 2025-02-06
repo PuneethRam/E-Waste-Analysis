@@ -1,0 +1,99 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n static admin_datta %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRecycle - Recycle Request</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-y4sB9gxt+7DVsS6z9vF5C5KtW/5HzgDXjm9Zc2Bb5F5i3FWPI/MC+9z0sWzgEIl/n" crossorigin="anonymous">
+    <style>
+        /* Internal CSS for custom styling */
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            background-image: url("{% static 'assets/images/bg2.jpg' %}");
+            background-size: cover; /* Scale the image to cover the entire background area */
+            background-repeat: no-repeat; /* Prevent the image from repeating */
+            
+            background-color: rgba(255, 255, 255, 0.8);
+            background-blend-mode: lighten;
+        }
+        .container {
+            margin-top: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">Recycle Request Form</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="deviceType">Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your Name">
+            </div>
+            <div class="form-group">
+                <label for="city">Select Your City</label>
+                <select class="form-control" id="city" name="city">
+                    <option value="city1">Chennai</option>
+                    <option value="city2">Bangalore</option>
+                    <!-- Add more city options here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="deviceType">Device Type</label>
+                <input type="text" class="form-control" id="deviceType" name="deviceType" placeholder="Enter Device Type">
+            </div>
+            <div class="form-group">
+                <label for="deviceModel">Device Model</label>
+                <input type="text" class="form-control" id="deviceModel" name="deviceModel" placeholder="Enter Device Model">
+            </div>
+            <div class="form-group">
+                <label for="weight">Approximate Weight (in kg)</label>
+                <input type="number" class="form-control" id="weight" name="weight" placeholder="Enter Weight">
+            </div>
+            <div class="form-group">
+                <label for="picture">Upload a Picture</label>
+                <input type="file" class="form-control-file" id="picture" name="picture">
+            </div>
+            <div class="form-group">
+                <label for="pickupType">Choose Pickup Type</label>
+                <select class="form-control" id="pickupType" name="pickupType">
+                    <option value="self">I will deliver to the collection center</option>
+                    <option value="pickup">I need pickup service</option>
+                </select>
+            </div>
+            <div class="form-group" id="pickupDateTime">
+                <label for="pickupDate">Select Pickup Date and Time</label>
+                <input type="datetime-local" class="form-control" id="pickupDate" name="pickupDate">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Request</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+3+w3f5F5f5l5v5l5t5z5s5P5G5f5i5y5K5K5" crossorigin="anonymous"></script>
+</body>
+</html>
+
+
+
+
+{% endblock content %}

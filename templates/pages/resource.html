@@ -1,0 +1,196 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n static admin_datta %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <title>YouTube Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            background-image: url("{% static 'assets/images/bg2.jpg' %}");
+            background-size: cover; /* Scale the image to cover the entire background area */
+            background-repeat: no-repeat; /* Prevent the image from repeating */
+            
+            background-color: rgba(255, 255, 255, 0.6);
+            background-blend-mode: lighten;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+
+        .header {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            width: 100%;
+            padding: 0 20px; /* Optional: Add horizontal padding for better readability */
+            box-sizing: border-box; /* Include padding in the width calculation */
+        }
+        
+
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f7f7f7;
+            border-radius: 10px;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .result-header {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .result-text {
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .result-texts {
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .ok {
+            background-color: #7ed321;
+            color: #fff;
+        }
+
+        .warning {
+            background-color: #ffcc00;
+            color: #fff;
+        }
+
+        .good {
+            background-color: #7ed321;
+            color: #fff;
+        }
+
+        .not-good {
+            background-color: #ff5a5f;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h2 class="header">Resource recovery Analysis</h2>
+            <form method="post" class="analysis-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name" class="label">Your UserId:</label>
+                    <input type="text" name="name" id="name" class="input" required>
+                </div>
+                <div class="form-group">
+                    <p>Kindly enter the type of device.</p>
+                </div>
+                <div class="form-group">
+                    <label for="deviceType">Device Type</label>
+                    <input type="text" class="form-control" id="deviceType" name="deviceType" placeholder="Enter Device Type">
+                </div>
+                <div class="form-group">
+                    <label for="deviceModel">Device Model</label>
+                    <input type="text" class="form-control" id="deviceModel" name="deviceModel" placeholder="Enter Device Model">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Approximate Weight (in kg)</label>
+                    <input type="number" class="form-control" id="weight" name="weight" placeholder="Enter Weight">
+                </div>
+                <div class="form-group">
+                    <label for="picture">Upload a Picture</label>
+                    <input type="file" class="form-control-file" id="pic" name="pic">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+
+        <div class="result-container">
+            <h2 class="header">Analysis Result</h2>
+            {% if latest_analysis_result %}
+            <div class="result-item">
+                <h3 class="result-header">Name</h3>
+                <p class="result-text">{{latest_analysis_result.username}}</p>
+            </div>
+            
+            <div class="result-item">
+                <h3 class="result-header">Device</h3>
+                <p class="result-text not-good">{{ latest_analysis_result.device_type }}</p>
+            </div>
+            <div class="result-item">
+                <h3 class="result-header">Resource Splitup</h3>
+                <p class="result-text">{{ latest_analysis_result.result }}</p>
+            </div>
+            
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+
+</html>
+
+{% endblock content %}

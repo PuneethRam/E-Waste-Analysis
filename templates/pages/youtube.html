@@ -1,0 +1,386 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n static admin_datta %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearest E-Waste Locator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-y4sB9gxt+7DVsS6z9vF5C5KtW/5HzgDXjm9Zc2Bb5F5i3FWPI/MC+9z0sWzgEIl/n" crossorigin="anonymous">
+    <style>
+        /* Internal CSS for custom styling */
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            background-image: url("{% static 'assets/images/bg4.jpg' %}");
+            background-size: cover; /* Scale the image to cover the entire background area */
+            background-repeat: no-repeat; /* Prevent the image from repeating */
+            
+            background-color: rgba(255, 255, 255, 0.8);
+            background-blend-mode: lighten;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">Nearest E-Waste Locator</h2>
+        <form>
+            <div class="form-group">
+                <label for="state">Select State</label>
+                <select class="form-control" id="state">
+                    <option value="">Select State</option>
+                    <option value="AndhraPradesh">Andhra Pradesh</option>
+                    <option value="ArunachalPradesh">Arunachal Pradesh</option>
+                    <option value="Assam">Assam</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Goa">Goa</option>
+                    <option value="Gujarat">Gujarat</option>
+                    <option value="Haryana">Haryana</option>
+                    <option value="HimachalPradesh">Himachal Pradesh</option>
+                    <option value="Jharkhand">Jharkhand</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="MadhyaPradesh">Madhya Pradesh</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Manipur">Manipur</option>
+                    <option value="Meghalaya">Meghalaya</option>
+                    <option value="Mizoram">Mizoram</option>
+                    <option value="Nagaland">Nagaland</option>
+                    <option value="Odisha">Odisha</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Sikkim">Sikkim</option>
+                    <option value="TamilNadu">Tamil Nadu</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Tripura">Tripura</option>
+                    <option value="UttarPradesh">Uttar Pradesh</option>
+                    <option value="Uttarakhand">Uttarakhand</option>
+                    <option value="WestBengal">West Bengal</option>
+
+                </select>
+            </div>
+            <div class="form-group" id="cityDropdown" style="display: none;">
+                <label for="city">Select City</label>
+                <select class="form-control" id="city">
+                    <option value="">Select City</option>
+                </select>
+            </div>
+        </form>
+        
+        <!-- Table for displaying recycling companies -->
+        <table class="table" id="companyTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Installed Capacity (Metric Tons per Annum)</th>
+                    <th>Address</th>
+                    <th>Map Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Company rows will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // jQuery for handling dynamic behavior
+        $(document).ready(function() {
+            // When a state is selected, show the city dropdown with respective city options
+            $('#state').on('change', function() {
+                var selectedState = $(this).val();
+                var cityDropdown = $('#city');
+                cityDropdown.empty();
+                if (selectedState === 'TamilNadu') {
+                    cityDropdown.append('<option value="Select City">Select City</option>');
+                    cityDropdown.append('<option value="Chennai">Chennai</option>');
+                    cityDropdown.append('<option value="Coimbatore">Coimbatore</option>');
+                    cityDropdown.append('<option value="Tiruvallur">Tiruvallur</option>');
+                    cityDropdown.append('<option value="Gummidipoondi">Gummidipoondi</option>');
+                    cityDropdown.append('<option value="Kanchipuram">Kanchipuram</option>');
+                    cityDropdown.append('<option value="Chengalpattu">Chengalpattu</option>');
+                    cityDropdown.append('<option value="Trichy">Trichy</option>');
+                    cityDropdown.append('<option value="Dharmapuri">Dharmapuri</option>');
+                } else if (selectedState === 'Karnataka') {
+                    cityDropdown.append('<option value="Bangalore">Bangalore</option>');
+                    cityDropdown.append('<option value="Mysore">Mysore</option>');
+                }
+
+                else if (selectedState === 'Andhra Pradesh') {
+                    cityDropdown.append('<option value="Vishakapatnam">Vishakapatnam</option>');
+                    cityDropdown.append('<option value="Srikakulam">Srikakulam</option>');
+                    cityDropdown.append('<option value="Ananthapur">Ananthapur</option>');
+                    cityDropdown.append('<option value="Krishna">Krishna</option>');
+                    cityDropdown.append('<option value="Chittor">Chittor</option>');
+                }
+
+                else if (selectedState === 'Assam') {
+                    cityDropdown.append('<option value="Gawahati">Gawahati</option>');
+                    
+                }
+                else if (selectedState === 'Chattisgarh') {
+                    cityDropdown.append('<option value="Durg">Durg</option>');
+                    cityDropdown.append('<option value="Raipur">Raipur</option>');
+
+                }
+
+                else if (selectedState === 'Delhi') {
+                    cityDropdown.append('<option value="Delhi">Delhi</option>');
+                    
+                }
+                else if (selectedState === 'Gujarat') {
+                    cityDropdown.append('<option value="Sabar kantha">Sabar kantha</option>');
+                    cityDropdown.append('<option value="Ahmedabad">Ahmedabad</option>');
+                    cityDropdown.append('<option value="Rajkot">Rajkot</option>');
+                    cityDropdown.append('<option value="Surat">Surat</option>');
+                    cityDropdown.append('<option value="Bharuch">Bharuch</option>');
+                    cityDropdown.append('<option value="Mehsana">Mehsana</option>');
+                    cityDropdown.append('<option value="Vadodara">Vadodara</option>');
+                    cityDropdown.append('<option value="Valsad">Valsad</option>');
+                    cityDropdown.append('<option value="Jamnagar">Jamnagar</option>');
+                    cityDropdown.append('<option value="Sachin">Sachin</option>');
+                    cityDropdown.append('<option value="Panchmahal">Panchmahal</option>');
+                    cityDropdown.append('<option value="Navsari">Navsari</option>');
+                    cityDropdown.append('<option value="Mehsana">Mehsana</option>');
+                    cityDropdown.append('<option value="Gandhinagar">Gandhinagar</option>');
+                    cityDropdown.append('<option value="Ankleshwar">Ankleshwar</option>');
+        
+
+                }
+                else if (selectedState === 'Goa') {
+                    cityDropdown.append('<option value="Bardez">Bardez</option>');
+                }
+
+                else if (selectedState === 'Haryana') {
+                    cityDropdown.append('<option value="Ambala">Ambala</option>');
+                    cityDropdown.append('<option value="Panchkula">Panchkula</option>');
+                    cityDropdown.append('<option value="Panipat">Panipat</option>');
+                    cityDropdown.append('<option value="Rohtak">Rohtak</option>');
+                    cityDropdown.append('<option value="Bahadugarh">Bahadugarh</option>');
+                    cityDropdown.append('<option value="Faridabad">Faridabad</option>');
+                    cityDropdown.append('<option value="Sonipat">Sonipat</option>');
+                    cityDropdown.append('<option value="Gurgeon">Gurgeon</option>');
+                    cityDropdown.append('<option value="Gurugram">Gurugram</option>');
+
+                }
+
+                else if (selectedState === 'Himachal Pradesh') {
+                    cityDropdown.append('<option value="Solan">Solan</option>');
+                    cityDropdown.append('<option value="Baddi">Baddi</option>');
+                }
+                else if (selectedState === 'Jammu & Kashmir') {
+                    cityDropdown.append('<option value="Gangyal">Gangyal</option>');
+                    cityDropdown.append('<option value="Srinagar">Srinagar</option>');
+                }
+                else if (selectedState === 'Jharkhand') {
+                    cityDropdown.append('<option value="Ranchi">Ranchi</option>');
+                    cityDropdown.append('<option value="Kokaro">Kokaro</option>');
+                }
+                else if (selectedState === 'Karnataka') {
+                    cityDropdown.append('<option value="Bangalore">Bangalore</option>');
+                    cityDropdown.append('<option value="Bommanahalli">Bommanahalli</option>');
+                    cityDropdown.append('<option value="kolar">kolar</option>');
+                    cityDropdown.append('<option value="Mysore">Mysore</option>');
+                    cityDropdown.append('<option value="Mandya">Mandya</option>');
+                    cityDropdown.append('<option value="Tumkur">Tumkur</option>');
+                    cityDropdown.append('<option value="Mangalore">Mangalore</option>');
+                    cityDropdown.append('<option value="Dharwad">Dharwad</option>');
+                    cityDropdown.append('<option value="Ramanagaram">Ramanagaram</option>');
+                    cityDropdown.append('<option value="Dasanapura">Dasanapura</option>');   
+
+                }
+                else if (selectedState === 'Kerala') {
+                    cityDropdown.append('<option value="Kochi">Kochi</option>');
+
+                }
+                else if (selectedState === 'Maharashtra') {
+                    cityDropdown.append('<option value="Dhule">Dhule</option>');
+                    cityDropdown.append('<option value="Palghar">Palghar</option>');
+                    cityDropdown.append('<option value="Pune">Pune</option>');
+                    cityDropdown.append('<option value="Nashik">Nashik</option>');
+                    cityDropdown.append('<option value="Raigad">Raigad</option>');
+                    cityDropdown.append('<option value="Nagpur">Nagpur</option>');
+                    cityDropdown.append('<option value="Thane">Thane</option>');
+                    cityDropdown.append('<option value="Mumbai">Mumbai</option>');
+                    cityDropdown.append('<option value="Vasai">Vasai</option>');
+                    cityDropdown.append('<option value="Osmanabad">Osmanabad</option>');
+                    cityDropdown.append('<option value="Aurangabad">Aurangabad</option>'); 
+                    cityDropdown.append('<option value="Solapur">Solapur</option>');    
+                    cityDropdown.append('<option value="Chakan">Chakan</option>');
+                    cityDropdown.append('<option value="Buldhana">Buldhana</option>');
+                    cityDropdown.append('<option value="Kolhapur">Kolhapur</option>');
+                }
+                else if (selectedState === 'Madhya Pradesh') {
+                    cityDropdown.append('<option value="Indore">Indore</option>');
+                    cityDropdown.append('<option value="Gwalior">Gwalior</option>');
+                }
+                else if (selectedState === 'Orissa') {
+                    cityDropdown.append('<option value="Khurda">Khurda</option>');
+                    cityDropdown.append('<option value="Sundargarh">Sundargarh</option>');
+                    cityDropdown.append('<option value="Ganjam">Ganjam</option>');
+                    cityDropdown.append('<option value="Bhubaneswar">Bhubaneswar</option>');
+                    cityDropdown.append('<option value="Khordha">Khordha</option>');
+
+                }
+                else if (selectedState === 'Punjab') {
+                    cityDropdown.append('<option value="SAS Nagar">SAS Nagar</option>');
+                    cityDropdown.append('<option value="Ludhiana">Ludhiana</option>');
+                    cityDropdown.append('<option value="Jalandhar">Jalandhar</option>');
+                    cityDropdown.append('<option value="Patial">Patial</option>');
+                }
+                else if (selectedState === 'Rajasthan') {
+                    cityDropdown.append('<option value="Alwar">Alwar</option>');
+                    cityDropdown.append('<option value="Jaipur">Jaipur</option>');
+                    cityDropdown.append('<option value="Sikar">Sikar</option>');
+                    cityDropdown.append('<option value="New Delhi">New Delhi</option>');
+                    cityDropdown.append('<option value="Barmer">Barmer</option>');
+                    cityDropdown.append('<option value="Dholpur">Dholpur</option>');
+                    
+                }
+                else if (selectedState === 'Telangana') {
+                    cityDropdown.append('<option value="Rangareddy">Rangareddy</option>');
+                    cityDropdown.append('<option value="Medchal-Malkajgiri">Medchal-Malkajgiri</option>');
+                    cityDropdown.append('<option value="Sangareddy">Sangareddy</option>');
+                    cityDropdown.append('<option value="Yadadri Bhuvanagiri">Yadadri Bhuvanagiri</option>');
+                    cityDropdown.append('<option value="Vikarabad">Vikarabad</option>');
+                }
+                else if (selectedState === 'Uttar Pradesh') {
+                    cityDropdown.append('<option value="Ghaziabad">Ghaziabad</option>');
+                    cityDropdown.append('<option value="Hapur">Hapur</option>');
+                    cityDropdown.append('<option value="Meerut">Meerut</option>');
+                    cityDropdown.append('<option value="Bulandshahr">Bulandshahr</option>');
+                    cityDropdown.append('<option value="Noida">Noida</option>');
+                    cityDropdown.append('<option value="Kanpur">Kanpur</option>');
+                    cityDropdown.append('<option value="Varanasi">Varanasi</option>');
+                    cityDropdown.append('<option value="Allahabad">Allahabad</option>');
+                    cityDropdown.append('<option value="Sant Kabairnagar">Sant Kabairnagar</option>');
+                    cityDropdown.append('<option value="Moradabad">Moradabad</option>');
+                    cityDropdown.append('<option value="Agra">Agra</option>');
+                    cityDropdown.append('<option value="Mathura">Mathura</option>');
+                    cityDropdown.append('<option value="Lucknow">Lucknow</option>');
+                    cityDropdown.append('<option value="Saharanpur">Saharanpur</option>');
+                    cityDropdown.append('<option value="Raebareli">Raebareli</option>');
+                    cityDropdown.append('<option value="Chandauli">Chandauli</option>');
+                    cityDropdown.append('<option value="Muzaffarnagar">Muzaffarnagar</option>');
+                    cityDropdown.append('<option value="Sitapur">Sitapur</option>');
+                    cityDropdown.append('<option value="Badaun">Badaun</option>');
+
+                }
+                else if (selectedState === 'Uttarkhand') {
+                    cityDropdown.append('<option value="Bhagwanpur">Bhagwanpur</option>');
+                    cityDropdown.append('<option value="Haridwar">Haridwar</option>');
+                    cityDropdown.append('<option value="Daulatpur">Daulatpur</option>');
+                    cityDropdown.append('<option value="Roorkee">Roorkee</option>');
+                    cityDropdown.append('<option value="Kashipur">Kashipur</option>');
+                    
+                }
+                else if (selectedState === 'West Bengal') {
+                    cityDropdown.append('<option value="Hoogly">Hoogly</option>');
+                    cityDropdown.append('<option value="Hoogly">Hoogly</option>');
+                    cityDropdown.append('<option value="PGS(South)">PGS(South)</option>');
+                    cityDropdown.append('<option value="PGS(North)">PGS(North)</option>');
+                    
+                }
+
+
+
+
+
+
+
+                
+
+
+
+
+
+                
+                if (selectedState !== '') {
+                    $('#cityDropdown').show();
+                } else {
+                    $('#cityDropdown').hide();
+                    $('#companyTable').hide();  
+                }
+            });
+
+            // When a city is selected, show the table with respective company data
+            $('#city').on('change', function() {
+                var selectedCity = $(this).val();
+                if (selectedCity !== '') {
+                    $('#companyTable').show();
+                    // Simulate populating the table with company data
+                    // Replace this with your actual data fetching and table population logic
+                    var tableBody = $('#companyTable tbody');
+                    tableBody.empty();
+                    if (selectedCity === 'Chennai') {
+                        tableBody.append('<tr><td>M/s.Tritech Systems</td><td>420</td><td>No.165/3,porur, Chennai-116</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Genbruze Solutions Pvt. ltd</td><td>1100</td><td>S.F.No. 9.28, 29pt, Athipattu Village, Ambattur Taluk, Chennai</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Ecosible Recyclers Pvt Ltd</td><td>6000</td><td>No.154A/B,8th Mahatma Gandhi Road, Tass Industrial Estate, Ambattur, Chennai – 600098</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Green Era Recyclers</td><td>146</td><td>Sivanandha Industries Estate, Dr. M.S. Udhayamurthy Nagar, Thadagam Road, Edayarpalayam, Coimbatore District - 641025</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s.A.K. Enterprises</td><td>170</td><td>No:12, Chakarapani St, Velacherry, Chennai-32.</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>AER Worldwide india Pvt Ltd</td><td>170</td><td>No.774,Elandandheri ,sadayankuppam village, near andar kuppam Check Post, Manali New Town, Chennai – 600103.</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s.Abishek Enterprises</td><td>6000</td><td>SF No. 2G, 2nd Ambattur, Chennai-600098</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s Trishyiraya Recycling India Pvt. Ltd</td><td>3100</td><td> Plot No.A-7, Phase-I, MEPZ-SEZ, Tambaram, Chennai-600 045 </td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s.M.G.Traders</td><td>600</td><td>No. 86, Nehru Street, Teachers Colony, Ambattur, Chennai - 600053</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Udhaya Traders</td><td>64</td><td>No. 242, Tiny Sector Ambattur Industrial Estate, Chennai – 600058</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s Arockia Enterprises</td><td>216</td><td>S.F.No.4/1E, Seevaram village, Sholinganallur taluk, Chennai – 600 097</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s KGN Electronics</td><td>250</td><td>No.48 A, Dr Ambedkar College Road, Erukkenchery village, Perambur taluk, Chennai district</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s R.M Computers</td><td>228</td><td>Plot No.229, 9th Street, Ambattur Chennai – 600098 </td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s SKV E-Waste Recycling Pvt Ltd</td><td>560</td><td>Plot No.154 A&B, Tass Industrial Area, Ambattur SIDCO Industrial Estate, Chennai – 600 098   </td><td><a href="#">View on Map</a></td></tr>');
+
+                    } else if (selectedCity === 'Coimbatore') {
+                        tableBody.append('<tr><td>M/s. Green Era Recyclers</td><td>146</td><td> 37, Sivanandha Industries Estate, Dr. M.S. Udhayamurthy Nagar, Thadagam Road, Edayarpalayam, Coimbatore District - 641025</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Green India Recyclers</td><td>456</td><td>SF. No. 26/1B, Kovilpalayam Road, Soolakal Village, Coimbatore District</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s Tharani Electronics Waste</td><td>207</td><td>SF No.381/3pt, 381/2pt, 384/2pt, 384/3 pt, Sarkar Samakulam village, Annur taluk, Coimbatore district</td><td><a href="#">View on Map</a></td></tr>');
+                        // Add more companies for Coimbatore here as needed
+
+                    }
+
+                    else if (selectedCity === 'Tiruvallur') {
+                        tableBody.append('<tr><td>M/s. JADG India E-Waste Recyclers Pvt. Ltd.</td><td>600</td><td>SF No. 256/1A1, Kollur Village, Kilikodi Post, Ponneri Taluk, Tiruvallur- 601206</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Virogreen India Pvt. Ltd.</td><td>15000</td><td> No. 297/1B2, No. 49, Pappankuppam Village, SR Kandigai Road, Gummidipoondi Taluk, Tiruvallur-601201</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Green E Waste Private Limited</td><td>422</td><td>S. F. No.294/pt, Ayanambakkam Village, Poonamallee Taluk, Tiruvallur District.</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s Ponniamman Enterprises</td><td>12000</td><td>SF No. 216/3, Tiruvallur village, Tiruvallur taluk, Tiruvallur district</td><td><a href="#">View on Map</a></td></tr>');
+                        // Add more companies for Coimbatore here as needed
+
+                    }
+                    else if (selectedCity === 'Bangalore') {
+                        tableBody.append('<tr><td>M/s. Sriram Eco Raksha Computer Services Pvt. Ltd</td><td>360</td><td> No. B-29, KSSIDC Indl. Estate, Bommasandra, Hosur Road, Anekal Taluk, Bangalore – 560 099</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. E-Friendly Waste Recyclers</td><td>300</td><td>, First Floor, No. 17 1st, Cross, Azeez Sait Industrial Town, Nayandahalli, Bangalore-560039</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. E-Hasiru</td><td>300</td><td>No. 168/B, 1st Floor, 7th Main Road, 3rd Phase, Peenya Industrial Area, Bangalore – 55</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. E-Parisara Pvt. Ltd.</td><td>9288</td><td>No. 30-P3, Dabaspet Bangalore</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Tech Logic</td><td>360</td><td>Unit-2, Shed No. 36, 2nd Main, Ranganathapura, Bangalore - 560 044</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. E-Scrapy Recyclers</td><td>720</td><td>No.106, Andrahalli Main Road, Byreshwara Industrial Area, Peenya 2nd stage, Bangalore - 560 058</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. KH E-Waste Recyclers</td><td>360</td><td>No. 104, 1st Main Road, 4th Cross, Azeez Sait Industrial Area, Nayandahalli, Bangalore – 39</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. RPN Industries</td><td>312</td><td>Plot No B2, KSSIDC Industrial Area, Kumbalgodu, Mysore Road, Bangalore-74</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Greenscape Eco Management Pvt. Ltd</td><td>600</td><td>Plot No. R-12, Veerasandra Indl Area, Anekal Tq, Bangalore Urban District – 100</td><td><a href="#">View on Map</a></td></tr>');
+                        tableBody.append('<tr><td>M/s. Trishyirya Recycling India Pvt. Ltd</td><td>360</td><td>, No. 315, 4th Phase, Peenya Industrial Estate, Bangalore - 560 058</td><td><a href="#">View on Map</a></td></tr>');
+                        
+
+                    }
+
+
+                    // You can fetch actual data from a database and populate the table dynamically
+                } else {
+                    $('#companyTable').hide();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+{% endblock content %}

@@ -1,0 +1,113 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n static admin_datta %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta tags, title, and CSS links here... -->
+    <style>
+        /* Include your custom CSS for the card effect here */
+        .recycle-card {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+            position: relative; /* Add this to enable absolute positioning */
+        }
+
+        .tracking-info {
+            display: none;
+            padding-top: 10px; /* Add padding to separate tracking info from button */
+        }
+
+        .expand-arrow {
+            cursor: pointer;
+            position: absolute; /* Position absolutely within the card */
+            top: 10px; /* Adjust top position for vertical alignment */
+            right: 10px; /* Position it to the right */
+        }
+
+        .expand-arrow:before {
+            content: "\25BA"; /* Rightward arrow character */
+            font-size: 24px;
+            display: block;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .expanded .expand-arrow:before {
+            transform: rotate(90deg);
+        }
+        p {
+            font-weight: bold;
+            font-size: 20px; /* You can adjust the font size as needed */
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">My Recycling Requests</h2>
+
+        {% for request in recycling_requests %}
+        <div class="recycle-card">
+            <h4>Request #{{ request.id }}</h4>
+            <p>Name: {{ request.username }}</p>
+            <img src="{{ request.picture.url }}" alt="Device Image" style="width: 200px; height: 200px;"><br><br>
+            <div class="tracking-info">
+                <!-- Tracking information content here -->
+                {% if request.stage == 0 %}
+                <img src="{% static 'assets/images/accept.jpeg' %}" alt="Your Custom Icon" style="width: 100px; height: 100px;">
+
+                <p>Status: Request Submitted</p>
+                {% elif request.stage == 1 %}
+                <p><span style="font-weight: bold; color: black;">Tracking Status:</span> <span style="color: green;">Request Accepted</span></p>
+                <img src="{% static 'assets/images/ack.png' %}" alt="Your Custom Icon" style="width: 100px; height: 100px;"><br><br>
+                <p>Delivery Partner: {{ request.delivery_partner }}</p>
+                <p>Phone Number: {{ request.delivery_partner_phone }}</p>
+                <p>Pickup Time: {{ request.pickup_date }}</p>
+                {% elif request.stage == 2 %}
+                <p>Status: Device Received</p>
+                <p>We received your device successfully.</p>
+                <img src="{% static 'assets/images/delivery.png' %}" alt="Your Custom Icon" style="width: 100px; height: 100px;">
+                
+
+                {% endif %}
+            </div>
+            <button class="btn btn-primary expand-arrow"></button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- JavaScript to toggle card expansion -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const expandButtons = document.querySelectorAll(".expand-arrow");
+
+            expandButtons.forEach(button => {
+                button.addEventListener("click", () => {
+                    const card = button.closest(".recycle-card");
+                    const trackingInfo = card.querySelector(".tracking-info");
+
+                    if (trackingInfo.style.display === "block") {
+                        trackingInfo.style.display = "none";
+                        card.classList.remove("expanded");
+                    } else {
+                        trackingInfo.style.display = "block";
+                        card.classList.add("expanded");
+                    }
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>
+
+
+
+{% endblock content %}
